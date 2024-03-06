@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  user_id  Int     @id @default(autoincrement())
+  username String  @db.VarChar(30)
+  password String  @db.VarChar(72)
+  email    String  @unique @db.VarChar(72)
+  address  String  @db.VarChar(72)
+  phone    String  @db.VarChar(14)
+  carts    Cart[]
+  Order    Order[]
+}
+
+model Cart {
+  cart_id    Int     @id @default(autoincrement())
+  user       User    @relation(fields: [user_id], references: [user_id])
+  user_id    Int
+  product    Product @relation(fields: [product_id], references: [product_id])
+  product_id Int
+  c_quantity Int
+}
+
+model Product {
+  product_id  Int           @id @default(autoincrement())
+  name        String        @db.VarChar(30)
+  description String        @db.VarChar(30)
+  price       Float         @db.Float
+  img         String        @db.VarChar(255)
+  brand       String        @db.VarChar(30)
+  stock       Int
+  carts       Cart[]
+  OrderDetail OrderDetail[]
+}
+
+model Order {
+  order_id       Int           @id @default(autoincrement())
+  user           User          @relation(fields: [user_id], references: [user_id])
+  user_id        Int
+  order_date     DateTime      @db.Timestamp(0)
+  total_price    Float         @db.Float
+  status         String        @db.VarChar(30)
+  payment_method String        @db.VarChar(30)
+  OrderDetail    OrderDetail[]
+}
+
+model OrderDetail {
+  order_detail_id Int     @id @default(autoincrement())
+  order           Order   @relation(fields: [order_id], references: [order_id])
+  order_id        Int
+  product         Product @relation(fields: [product_id], references: [product_id])
+  product_id      Int
+  quantity        Int
+  subtotal        Int
+}
